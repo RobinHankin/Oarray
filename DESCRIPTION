@@ -7,4 +7,5 @@ Author: Jonathan Rougier <j.c.rougier@bristol.ac.uk>
 Description: Generalise the starting point of the array index.
 License: GPL
 Maintainer: Robin K. S. Hankin <hankin.robin@gmail.com>
-
+URL: https://github.com/RobinHankin/Oarray.git
+BugReports: https://github.com/RobinHankin/Oarray/issues
