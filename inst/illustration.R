@@ -42,7 +42,7 @@ a[,,p,]
 
 ## Now try some R idiom in which symbol p exists in multiple environments:
 
-p <- 1
+p <- 1   # not strictly necessary, this line is here to remind me that p=1 in the global environment
 f <- function(a,p){ a[,,p,] }
 cat('f(a,p=3):\n')
 f(a,p=3)
@@ -52,8 +52,14 @@ f(a,p)
 
 
 g <- function(p){
-  p <- 4
-  return(f(a,p=5))
+  return(f(a,p))
 }
 cat("g(p):\n")
-g(p)
+g(p=4)
+
+h <- function(p){
+  p <- 5
+  return(f(a,p=6))
+}
+cat("h(p):\n")
+h(p)
