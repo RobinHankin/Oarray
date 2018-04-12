@@ -52,8 +52,8 @@ f(a,p)
 
 
 g <- function(p){
-  p <- 19
-  return(f(a,p=3))
+  p <- 4
+  return(f(a,p=5))
 }
 cat("g(p):\n")
 g(p)
