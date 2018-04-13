@@ -3,6 +3,12 @@
 ## which uses match.call() in the same way as [.Oarray() of the Oarray
 ## package does.
 
+## In function `[.foo()`, mc is match.call() and we are interested in
+## mc[[5]] because this is 'p'.  The first element is the function
+## call, thhe second is 'a', the third and fourth are <missing>, the
+## fifth is p which is problematic because it has different values in
+## the various environments in which we might evaluate it.
+
 
 rm(list=ls())
 
