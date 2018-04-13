@@ -63,3 +63,7 @@ h <- function(p){
 }
 cat("h(p):\n")
 h(p)
+
+## Final example shows that p might not exist in all environments that might be accessed:
+rm(p)
+h(p=7)
