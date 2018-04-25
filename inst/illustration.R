@@ -1,19 +1,21 @@
 ## minimal example showing the problems of evaluation within accessor
 ## methods.  Here we see an extractor method for the "foo" class,
 ## which uses match.call() in the same way as [.Oarray() of the Oarray
-## package does.
+## package.
 
 ## In function `[.foo()`, mc is match.call() and we are interested in
-## mc[[5]] because this is 'p'.  The first element is the function
-## call, thhe second is 'a', the third and fourth are <missing>, the
-## fifth is p which is problematic because it has different values in
-## the various environments in which we might evaluate it.
+## mc[[5]] because this is 'p' in the calls below (such as
+## "a[,,p=2,]").  The first element of mc is the function call, the
+## second is 'a', the third and fourth are <missing>, the fifth is p.
+## This is problematic because it has different values in the various
+## environments in which we might evaluate it.
 
 
 rm(list=ls())
 
 `[.foo` <- function(x, ...){
   mc <- match.call()
+  fi <- sys.call()
 
   cat("mc gives: ")
   print(mc)   # NB: cannot cat(mc) as cat() cannot handle language types.
@@ -23,11 +25,22 @@ rm(list=ls())
     cat(mc[[i]])
     cat("|\n")
   }
+  for(i in 1:6){
+    cat(paste("fi[[",i, "]] gives: |",sep=""))
+    cat(fi[[i]])
+    cat("|\n")
+  }
 
   cat("In the above, the output of print() is given between the two vertical lines.\n")
 
   for(i in 0:9){
     cat(noquote(paste("eval(mc[[5]],",i,") evaluates to " , eval(mc[[5]],i),"\n",sep="")))
+  }
+
+  cat("----\n")
+  
+  for(i in 0:9){
+    cat(noquote(paste("eval(fi[[5]],",i,") evaluates to " , eval(fi[[5]],i),"\n",sep="")))
   }
 
   print(noquote(paste("mc[[5]]  evaluates to " , eval(mc[[5]],i),sep="")))
@@ -70,6 +83,6 @@ h <- function(p){
 cat("h(p):\n")
 h(p)
 
-## Final example (which causes an error) shows that p might not exist in all environments that might be accessed:
+## Final example (which gives an error) shows that p might not exist in all environments that might be accessed:
 rm(p)
 h(p=7)
