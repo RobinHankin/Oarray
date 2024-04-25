@@ -1,0 +1,130 @@
+---
+title: "Some difficulties in the `Oarray` package"
+author: "Robin K. S. Hankin"
+output: html_vignette
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Oarray_difficulties}
+  %\usepackage[utf8]{inputenc}
+---
+
+
+```{r setup, include=FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE) 
+knitr::opts_chunk$set(echo = TRUE)
+library("Oarray")
+set.seed(0)
+```
+
+This short document gives near-minimal examples showing the problems
+of evaluation within accessor methods in the `Oarray` package.  Here
+we see an extractor method for the "foo" class, which uses
+`match.call()` in the same way as `[.Oarray()` of the `Oarray` package.
+
+
+```{r defineextractfoo}
+`[.foo` <- function(x, ...){
+  mc <- match.call()
+  fi <- sys.call()
+
+  cat("mc gives: ")
+  print(mc)   # NB: cannot cat(mc) as cat() cannot handle language types.
+
+  for(i in 1:6){
+    cat(paste("mc[[",i, "]] gives: |",sep=""))
+    cat(mc[[i]])
+    cat("|\n")
+  }
+  for(i in 1:6){
+    cat(paste("fi[[",i, "]] gives: |",sep=""))
+    cat(fi[[i]])
+    cat("|\n")
+  }
+
+  cat("In the above, the output of print() is given between the two vertical lines.\n")
+
+  for(i in 0:9){
+    cat(noquote(paste("eval(mc[[5]],",i,") evaluates to " , eval(mc[[5]],i),"\n",sep="")))
+  }
+
+  cat("----\n")
+  
+  for(i in 0:9){
+    cat(noquote(paste("eval(fi[[5]],",i,") evaluates to " , eval(fi[[5]],i),"\n",sep="")))
+  }
+
+  print(noquote(paste("mc[[5]]  evaluates to " , eval(mc[[5]],i),sep="")))
+
+  cat("\n\n\n\n\n")
+  return(0)
+}
+```
+
+
+Above, in function `[.foo()`, `mc` is `match.call()` and we are
+interested in `mc[[5]]` because this is `p` in the calls below (such
+as `"a[,,p=2,]"`).  
+
+```{r executeextractfoo}
+a <- 0
+class(a) <- "foo"
+
+p <- 1
+a[,,p=2,]   
+```
+
+Above, the first element of `mc` is the function call, the second is
+`a`, the third and fourth are `<missing>`, the fifth is just 2.  Now
+we will try using the value of variable `p`:
+
+
+```{r executeextractbutusingp}
+p <- 1
+a[,,p,]
+```
+
+Above, we use `p` as a variable (that happens to have the value 1).
+So both these examples work as intended.  But, I will give some
+examples that do not work as intended, specifically some R idiom in
+which symbol `p` exists in multiple environments.  We will create a
+function `f()` and access `[.foo()` from within `f()`.  First, we will
+pass the value of `p` to `f()`:
+
+```{r fp2}
+p <- 1
+f <- function(a,p){
+    print(p)
+    a[,,p,]
+}
+f(a,p)
+```
+
+Above we see that `f()` works as intended: it is picking up the value
+of `p` from the global environment (viz, 1).  Now we will try passing
+a named argument to `f()`:
+
+```{r fpmultipleenv}
+p <- 1
+f(a,p=3)
+```
+
+Above we want `p` to have the value 3, but all the evaluations of
+`mc[[5]]` (which is he symbol `p`) evaluate to 1, its value in the
+global environment.  This is not what we want: it is surprising and
+misleading.  Now an unnamed argument:
+
+
+```{r fpmult}
+p <- 1
+f(a,3)
+```
+
+Above we see another surprising result: even though `f()`'s scope has
+a value for `p` of 3, `mc[[5]]` nevertheless returns the global value
+of 1.  Final example (which gives an error) shows that p might not
+exist in all environments that might be accessed:
+
+```{r removep, error=TRUE}
+rm(p)
+h(p=7)
+```
