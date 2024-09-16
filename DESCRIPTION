@@ -9,3 +9,6 @@ License: GPL
 Maintainer: Robin K. S. Hankin <hankin.robin@gmail.com>
 URL: https://github.com/RobinHankin/Oarray.git
 BugReports: https://github.com/RobinHankin/Oarray/issues
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
