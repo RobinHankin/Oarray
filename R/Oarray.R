@@ -57,7 +57,7 @@ function(data=NA, dim=length(data), dimnames=NULL, offset=rep(1, length(dim)),
 # and maps them using the offset: note that drop=FALSE only works
 # if provided as the final argument
 
-".handleTheOffset" <- function(mc, dim, offset, dn)
+"handleTheOffset" <- function(mc, dim, offset, dn)
 {
   for (i in seq(along=dim)) {
     ii <- mc[[2+i]]
@@ -109,7 +109,7 @@ function(data=NA, dim=length(data), dimnames=NULL, offset=rep(1, length(dim)),
   if (k < 2+length(dim))
     stop("incorrect number of dimensions")
 
-  mc <- .handleTheOffset(mc, dim, offset, dn)
+  mc <- handleTheOffset(mc, dim, offset, dn)
   mc[[1]] <- as.name("[")
   mc[[2]] <- as.name("x")
   x <- as.array(x)
@@ -148,7 +148,7 @@ function(data=NA, dim=length(data), dimnames=NULL, offset=rep(1, length(dim)),
   if (k < 3+length(dim))
     stop("incorrect number of dimensions")
 
-  mc <- .handleTheOffset(mc, dim, offset, dn)
+  mc <- handleTheOffset(mc, dim, offset, dn)
   mc[[1]] <- as.name("[<-")
   mc[[2]] <- as.name("x")
   x <- as.array(x)
